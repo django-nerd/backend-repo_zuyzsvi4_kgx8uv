@@ -1,0 +1,33 @@
+INFO:     Will watch for changes in these directories: ['/home/workspace']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [162] using StatReload
+INFO:     Started server process [164]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     172.20.0.1:41798 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     172.20.0.1:41812 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41826 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41828 - "GET /offices HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41812 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41826 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41828 - "GET /offices HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41844 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41836 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41854 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41854 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41854 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:39074 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41854 - "GET /offices HTTP/1.1" 200 OK
+INFO:     172.20.0.1:39074 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53464 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:41854 - "GET /offices HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53480 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53476 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53492 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53492 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:48588 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:48588 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:55334 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:55334 - "GET /track HTTP/1.1" 200 OK
+INFO:     172.20.0.1:38158 - "GET /sessions HTTP/1.1" 200 OK
+INFO:     172.20.0.1:38158 - "GET /track HTTP/1.1" 200 OK

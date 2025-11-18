@@ -1,8 +1,14 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime
 
-app = FastAPI()
+from database import db, create_document, get_documents
+from schemas import Team, Member, Office, Session, TeamLocation, HelpTicket
+
+app = FastAPI(title="Naithika Foundations Education Tracker API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,15 +20,10 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from FastAPI Backend!"}
-
-@app.get("/api/hello")
-def hello():
-    return {"message": "Hello from the backend API!"}
+    return {"message": "Naithika Foundations Backend Running"}
 
 @app.get("/test")
 def test_database():
-    """Test endpoint to check if database is available and accessible"""
     response = {
         "backend": "✅ Running",
         "database": "❌ Not Available",
@@ -31,39 +32,96 @@ def test_database():
         "connection_status": "Not Connected",
         "collections": []
     }
-    
     try:
-        # Try to import database module
-        from database import db
-        
         if db is not None:
-            response["database"] = "✅ Available"
-            response["database_url"] = "✅ Configured"
-            response["database_name"] = db.name if hasattr(db, 'name') else "✅ Connected"
+            response["database"] = "✅ Connected & Working"
+            response["database_url"] = "✅ Set" if os.getenv("DATABASE_URL") else "❌ Not Set"
+            response["database_name"] = os.getenv("DATABASE_NAME") or "❌ Not Set"
             response["connection_status"] = "Connected"
-            
-            # Try to list collections to verify connectivity
-            try:
-                collections = db.list_collection_names()
-                response["collections"] = collections[:10]  # Show first 10 collections
-                response["database"] = "✅ Connected & Working"
-            except Exception as e:
-                response["database"] = f"⚠️  Connected but Error: {str(e)[:50]}"
+            response["collections"] = db.list_collection_names()
         else:
-            response["database"] = "⚠️  Available but not initialized"
-            
-    except ImportError:
-        response["database"] = "❌ Database module not found (run enable-database first)"
+            response["database"] = "❌ Not Available"
     except Exception as e:
-        response["database"] = f"❌ Error: {str(e)[:50]}"
-    
-    # Check environment variables
-    import os
-    response["database_url"] = "✅ Set" if os.getenv("DATABASE_URL") else "❌ Not Set"
-    response["database_name"] = "✅ Set" if os.getenv("DATABASE_NAME") else "❌ Not Set"
-    
+        response["database"] = f"❌ Error: {str(e)[:120]}"
     return response
 
+# ---------- Public Schemas endpoint (for admin viewers) ----------
+class SchemaInfo(BaseModel):
+    name: str
+    fields: List[str]
+
+@app.get("/schema", response_model=List[SchemaInfo])
+async def get_schema():
+    models = [Team, Member, Office, Session, TeamLocation, HelpTicket]
+    output = []
+    for m in models:
+        output.append(SchemaInfo(name=m.__name__.lower(), fields=list(m.model_fields.keys())))
+    return output
+
+# ---------- Team & Member Directory ----------
+@app.post("/teams")
+async def create_team(team: Team):
+    team_id = create_document("team", team)
+    return {"id": team_id}
+
+@app.get("/teams")
+async def list_teams():
+    return get_documents("team")
+
+@app.post("/members")
+async def create_member(member: Member):
+    member_id = create_document("member", member)
+    return {"id": member_id}
+
+@app.get("/members")
+async def list_members():
+    return get_documents("member")
+
+# ---------- Offices ----------
+@app.post("/offices")
+async def create_office(office: Office):
+    office_id = create_document("office", office)
+    return {"id": office_id}
+
+@app.get("/offices")
+async def list_offices():
+    return get_documents("office")
+
+# ---------- Sessions (teaching visits) ----------
+@app.post("/sessions")
+async def create_session(session: Session):
+    sess_id = create_document("session", session)
+    return {"id": sess_id}
+
+@app.get("/sessions")
+async def list_sessions(mandal: Optional[str] = None, village: Optional[str] = None):
+    filt = {}
+    if mandal:
+        filt["mandal"] = mandal
+    if village:
+        filt["village"] = village
+    return get_documents("session", filt)
+
+# ---------- Live Team Tracking ----------
+@app.post("/track")
+async def update_location(loc: TeamLocation):
+    loc_id = create_document("teamlocation", loc)
+    return {"id": loc_id}
+
+@app.get("/track")
+async def get_locations(team_id: Optional[str] = None, limit: int = 20):
+    filt = {"team_id": team_id} if team_id else {}
+    return get_documents("teamlocation", filt, limit)
+
+# ---------- Help Desk ----------
+@app.post("/help")
+async def create_ticket(ticket: HelpTicket):
+    ticket_id = create_document("helpticket", ticket)
+    return {"id": ticket_id}
+
+@app.get("/help")
+async def list_tickets(limit: int = 50):
+    return get_documents("helpticket", {}, limit)
 
 if __name__ == "__main__":
     import uvicorn
